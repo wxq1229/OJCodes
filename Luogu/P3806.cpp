@@ -1,72 +1,72 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define rep(i,j,k) for (int i=(int)(j);i<=(int)(k);i++)
-#define per(i,j,k) for (int i=(int)(j);i>=(int)(k);i--)
-#define mp make_pair
 #define pb push_back
-#define fi first
-#define se second
-const int MAXN=100010;
-int dp[MAXN],size[MAXN],vis[MAXN],head[MAXN],cnt=0;
-struct edge{int to,w,nxt;}e[MAXN<<1];
-void add(int x,int y,int w){e[++cnt]=(edge){y,w,head[x]};head[x]=cnt;}
-void addedge(int x,int y,int w){add(x,y,w);add(y,x,w);}
-int root,n,Q,sum,q[MAXN],ans[10000010];
-void getRoot(int x,int fa){
-	size[x]=1;dp[x]=0;
-	for (int i=head[x];i;i=e[i].nxt){
-		int v=e[i].to;
-		if (vis[v]||v==fa)continue;
-		getRoot(v,x);
-		size[x]+=size[v];
-		dp[x]=max(dp[x],size[v]);
+#define fore(i,x) for(int i=head[x],v=e[i].to,w=e[i].w;i;i=e[i].nxt,v=e[i].to,w=e[i].w)
+const int N=1e5+10;
+int n,m;
+struct edge
+{
+	int to,nxt,w;
+}e[N<<1];
+int head[N],cnt=0;
+inline void ade(int x,int y,int w)
+{e[++cnt]=(edge){y,head[x],w};head[x]=cnt;}
+inline void addedge(int x,int y,int w){ade(x,y,w),ade(y,x,w);}
+vector<int>qs;
+int ans[1010];
+int siz[N],vis[N],mx[N],rt,all;
+void getrt(int x,int prev)
+{
+	siz[x]=1,mx[x]=0;
+	fore(i,x) if(!vis[v]&&v!=prev)
+	{
+		getrt(v,x),siz[x]+=siz[v];
+		mx[x]=max(mx[x],siz[v]);
 	}
-	dp[x]=max(dp[x],sum-size[x]);
-	if (dp[x]<dp[root]) root=x;
+	mx[x]=max(mx[x],all-siz[x]);
+	if(mx[x]<mx[rt]) rt=x;
 }
-int dis[MAXN],d[MAXN],tot=0;
-void getDis(int x,int fa){
-	d[++tot]=dis[x];
-	for (int i=head[x];i;i=e[i].nxt){
-		int v=e[i].to;
-		if (v==fa||vis[v])continue;
-		dis[v]=dis[x]+e[i].w;
-		getDis(v,x);
-	}
+int dis[N],tot=0;
+inline void getd(int x,int prev,int d)
+{
+	dis[++tot]=d;
+	fore(i,x) if(v!=prev&&!vis[v]) getd(v,x,d+w);
 }
-void calc(int x,int w,int k1){
-	tot=0;dis[x]=w;getDis(x,w);
-	rep (i,1,tot) rep (j,1,tot)
-		ans[d[i]+d[j]]+=k1;
-}
-void solve(int x){
-	calc(x,0,1);
+#define IT multiset<int>::iterator
+multiset<int> s;
+void dfz(int x)
+{
 	vis[x]=1;
-	for (int i=head[x];i;i=e[i].nxt){
-		int v=e[i].to;
-		if (vis[v])continue;
-		calc(v,e[i].w,-1);
-		sum=size[v],dp[root=0]=n;
-		getRoot(v,0);solve(root);
+	fore(ei,x) if(!vis[v])
+	{
+		tot=0,getd(v,x,w);
+		for(int i=0;i<m;i++)
+		{
+			if(ans[i]) continue;
+			for(int j=1;j<=tot;j++)
+			{
+				if(dis[j]==qs[i]){ans[i]=1;break;}
+				IT it=s.lower_bound(qs[i]-dis[j]);
+				if(it==s.end()) continue;
+				if(dis[j]+(*it)==qs[i]){ans[i]=1;break;}
+			}
+		}
+		for(int i=1;i<=tot;i++) s.insert(dis[i]);
+	}
+	s.clear();
+	fore(i,x) if(!vis[v])
+	{
+		all=mx[rt=0]=siz[v];
+		getrt(v,x),dfz(rt);
 	}
 }
-int main(){
-	scanf("%d%d",&n,&Q);
-	rep (i,1,n-1){
-		int x,y,w;scanf("%d%d%d",&x,&y,&w);
-		addedge(x,y,w);
-	}
-	dp[root=0]=n,sum=n;
-	getRoot(1,0);solve(root);
-	while (Q--){
-		int k1;scanf("%d",&k1);
-		puts(ans[k1]?"AYE":"NAY");
-	}
+int main()
+{
+	scanf("%d%d",&n,&m);
+	for(int i=1,x,y,w;i<n;i++)
+		scanf("%d%d%d",&x,&y,&w),addedge(x,y,w);
+	for(int i=1,x;i<=m;i++) scanf("%d",&x),qs.pb(x);
+	all=mx[rt=0]=n,getrt(1,0),dfz(rt);
+	for(int i=0;i<m;i++) puts(ans[i]?"AYE":"NAY");
 	return 0;
 }
-/*
-2 1
-1 2 2
-2
-*/
-

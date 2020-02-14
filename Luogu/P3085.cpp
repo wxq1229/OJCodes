@@ -40,8 +40,9 @@ void upd(int x,int k1=1)
 	tmp[n+d[x]]--;
 }
 ll ans=0;
-ll calc(int x)
+void calc(int x)
 {
+	// cout<<"CALC "<<x<<" "<<d[x]<<"\n";
 	ans+=cnt[1][n-d[x]]+cnt[0][n-d[x]]*(tmp[n+d[x]]!=0);
 	if(d[x]==0) ans+=tmp[n]>1;
 	tmp[n+d[x]]++;
@@ -50,11 +51,13 @@ ll calc(int x)
 }
 void dfz(int x)
 {
+	// cout<<x<<"\n"; 
 	vis[x]=1,dfs(x,0,0);
 	tmp[n]=1;
 	fore(i,x) if(!vis[v]) calc(v),upd(v);
 	fore(i,x) if(!vis[v]) upd(v,-1);
 	tmp[n]=0;
+	// cout<<"---------------\n";
 	fore(i,x) if(!vis[v])
 	{
 		all=siz[v],mx[rt=0]=all;

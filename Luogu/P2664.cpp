@@ -64,7 +64,9 @@ void calc(int x)
     {
         sum-=siz[v],tot[c]-=siz[v];
         tmp[c]++,upd(v,x,-1),tmp[c]--;
-        tmp[c]++,osiz=siz[x]-siz[v],getans(v,x),tmp[c]--;
+        tmp[c]++,osiz=siz[x]-siz[v],sum-=tot[c],nw=1;
+        getans(v,x);
+        tmp[c]--,nw=0,sum+=tot[c];
         sum+=siz[v],tot[c]+=siz[v];
         tmp[c]++,upd(v,x,1),tmp[c]--;
     }

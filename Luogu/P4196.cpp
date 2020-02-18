@@ -1,104 +1,109 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define rep(i,j,k) for (int i=(int)(j);i<=(int)(k);i++)
-#define per(i,j,k) for (int i=(int)(j);i>=(int)(k);i--)
+#define pb push_back
 typedef double db;
-const db eps=1e-8;
-int sign(db k1){
-	if (k1<-eps) return -1; else if (k1>eps) return 1; else return 0;
-}
-struct point{
-	db x,y;
-	point operator + (point k1)const{return (point){x+k1.x,y+k1.y};}
-	point operator - (point k1)const{return (point){x-k1.x,y-k1.y};}
-	point operator * (db k1)const{return (point){x*k1,y*k1};}
-	point operator / (db k1)const{return (point){x/k1,y/k1};}
-	int getP()const{
-		return sign(y)==-1||(sign(y)==0&&sign(x)==-1);
-	}
-	void print(){printf("%.3f %.3f",x,y);}
-	void scan(){scanf("%lf%lf",&x,&y);}
+const db eps=1e-9;
+inline int sign(db a)
+{return a<-eps?-1:a>eps;}
+struct point
+{
+    db x,y;
+    point(db xx=0,db yy=0):x(xx),y(yy){}
+    db abs2(){return x*x+y*y;}
+    db abs(){return sqrt(abs2());}
+    int quad()const
+    {
+    	return sign(y)==-1||(sign(y)==0&&sign(x)==-1);
+    }
+    void scan()
+    {scanf("%lf%lf",&x,&y);}
+    void print(char ch=' ')
+    {
+        printf("%.4f %.4f",x,y);
+        putchar(ch);
+    }
 };
-db dot(point k1,point k2){
-	return k1.x*k2.x+k1.y*k2.y;
+point operator + (point a,point b){return (point){a.x+b.x,a.y+b.y};}
+point operator - (point a,point b){return (point){a.x-b.x,a.y-b.y};}
+point operator * (point a,db x){return (point){a.x*x,a.y*x};}
+point operator / (point a,db x){return (point){a.x/x,a.y/x};}
+db operator * (point a,point b){return a.x*b.y-a.y*b.x;}
+db operator ^ (point a,point b){return a.x*b.x+a.y*b.y;}
+bool operator < (point a,point b){return a.x<b.x||(a.x==b.x&&a.y<b.y);}
+typedef vector<point> polygon;
+db area(polygon P)
+{
+    int n=P.size(); db ret=0.0;
+    for(int i=0;i<n;i++) ret+=P[i]*P[(i+1)%n];
+    return ret/2.0;
 }
-db cross(point k1,point k2){
-	return k1.x*k2.y-k1.y*k2.x;
+point intersect(point A,point B,point C,point D)
+{
+    point u=A-C,v=B-A,w=D-C; db x=(w*u)/(v*w);
+    return A+v*x;
 }
-point getLL(point k1,point k2,point k3,point k4){
-	point v=k2-k1,w=k4-k3;return k1+v*(cross(w,k1-k3)/cross(v,w));
+bool cmpang(point a,point b)
+{
+    if(a.quad()!=b.quad()) return a.quad()<b.quad();
+    else return sign(a*b)>0;
 }
-int compareangle(point k1,point k2){
-	return k1.getP()<k2.getP()||(k1.getP()==k2.getP()&&sign(cross(k1,k2))>0);
-}
-struct line{
-	point p[2];
-	line(){}
-	line(point k1,point k2){p[0]=k1; p[1]=k2;}
-	point &operator [] (int k1){return p[k1];}
-	point dir(){return p[1]-p[0];}
-	int include(point k1){
-		return sign(cross(p[1]-p[0],k1-p[0]))>0;
-	}
+struct line
+{
+    point p[2];
+    line(point A,point B)
+    {p[0]=A,p[1]=B;}
+    line(){}
+    point &operator [] (int i){return p[i];}
+    point dir(){return p[1]-p[0];}
+    int include(point P){return sign((p[1]-p[0])*(P-p[0]))>0;}
+    void print()
+    {
+        p[0].print(' '),p[1].print('\n');
+    }
 };
-point getLL(line l1,line l2){
-	return getLL(l1[0],l1[1],l2[0],l2[1]);
+point intersect(line a,line b){return intersect(a[0],a[1],b[0],b[1]);}
+bool parellel(line a,line b){return sign(a.dir()*b.dir())==0;}
+bool samed(line a,line b)
+{return parellel(a,b)&&sign(a.dir()^b.dir())>0;}
+bool operator < (line a,line b)
+{
+    if(samed(a,b)) return b.include(a[0]);
+    else return cmpang(a.dir(),b.dir());
 }
-int parellel(line l1,line l2){
-	return sign(cross(l1.dir(),l2.dir()))==0;
-}
-int sameDir(line l1,line l2){
-	return parellel(l1,l2)&&sign(dot(l1.dir(),l2.dir()))==1;
-}
-int operator < (line l1,line l2){
-	if (sameDir(l1,l2)) return l2.include(l1[0]); else return compareangle(l1.dir(),l2.dir());
-}
-int checkpos(line l1,line l2,line l3){
-	return l3.include(getLL(l1,l2));
-}
-int getHPI(vector<line> L,vector<point>&H){
-	int n=L.size(); H.clear();
-	sort(L.begin(),L.end()); deque<line> q;
-	for (int i=0;i<(int)L.size();i++){
-		if (i&&sameDir(L[i],L[i-1])) continue;
-		while (q.size()>1&&!checkpos(q[q.size()-2],q[q.size()-1],L[i])) q.pop_back();
-		while (q.size()>1&&!checkpos(q[0],q[1],L[i])) q.pop_front();
-		q.push_back(L[i]);
-	}
-	while (q.size()>2&&!checkpos(q[q.size()-2],q[q.size()-1],q[0])) q.pop_back();
-	while (q.size()>2&&!checkpos(q[0],q[1],q[q.size()-1])) q.pop_front();
-	if (q.size()==0) return 0; else if (q.size()<=2) return -1;
-	for (int i=0;i<(int)q.size()-1;i++)
-		H.push_back(getLL(q[i],q[i+1]));
-	H.push_back(getLL(q[q.size()-1],q[0]));
-	return 1;
-}
-db polygonarea(vector<point>A){
-	int n=A.size(); db area=0.0;
-//	for (int i=0;i<n;i++) A[i].print(),puts("");
-	for (int i=1;i<(int)A.size()-1;i++)
-		area+=cross(A[i]-A[0],A[i+1]-A[0]);
-	return area/2.0;
+int getHPI(vector<line> L,polygon &H)
+{
+    #define chkL(l,a,b) (l.include(intersect(a,b)))
+    int n=L.size(); H.clear();
+    static deque<line> q; q.clear();
+    sort(L.begin(),L.end());
+    for(int i=0;i<n;i++)
+    {
+        if(i&&samed(L[i],L[i-1])) continue;
+        while(q.size()>1&&!chkL(L[i],q[q.size()-1],q[q.size()-2])) q.pop_back();
+        while(q.size()>1&&!chkL(L[i],q[0],q[1])) q.pop_front();
+        q.pb(L[i]);
+    }
+    while(q.size()>2&&!chkL(q[0],q[q.size()-1],q[q.size()-2]))
+        q.pop_back();
+    while(q.size()>2&&!chkL(q[q.size()-1],q[0],q[1]))
+        q.pop_front();
+    if(q.size()==0) return 1; if(q.size()<=2) return -1;
+    int m=q.size();
+    for(int i=0;i<m;i++) H.pb(intersect(q[i],q[(i+1)%m]));
+    return 1;
 }
 vector<line> L;
-vector<point> H;
-int main(){
-	int T; for (scanf("%d",&T);T;T--){
-		int n; scanf("%d",&n);
-		vector<point>P(n);
-		for (int i=0;i<n;i++)P[i].scan();
-		for (int i=0;i<n;i++)L.push_back(line(P[i],P[(i+1)%n]));
-	}
-	getHPI(L,H);
-	printf("%.3f\n",polygonarea(H));
-	return 0;
+polygon P,H;
+int main()
+{
+    int _;scanf("%d",&_);while(_--)
+    {
+        int n;scanf("%d",&n);
+        P.resize(n);
+        for(int i=0;i<n;i++) P[i].scan();
+        for(int i=0;i<n;i++) L.pb(line(P[i],P[(i+1)%n]));
+    }
+    getHPI(L,H);
+    printf("%.3f\n",area(H));
+    return 0;
 }
-
-
-
-
-
-
-
-
-

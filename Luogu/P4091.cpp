@@ -58,7 +58,7 @@ int main()
 	for(int i=0;i<=n;i++)
 	{
 		f[i]=1ll*((i&1)?P-1:1)*ifac[i]%P;
-		if(i==0) g[i]=1; else if(i==1) g[i]=n+1;
+		if(i==1) g[i]=n+1;
 		else g[i]=1ll*sub(fpow(i,n+1),1)*ifac[i]%P*fpow(i-1,P-2)%P;
 	}
 	int limit=1; while(limit<=n*2)limit<<=1;

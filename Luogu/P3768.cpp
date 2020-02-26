@@ -54,7 +54,7 @@ map<ll,int> fsum;
 int Sf(ll n) {
     if(n<=maxn) return phi[n];
     if(fsum.count(n)) return fsum[n];
-    int ans=sqr(normal(ss1(n)));
+    int ans=sqr(ss1(n));
     for(ll l=2,r=0;l<=n;l=r+1) {
         r=n/(n/l);
         ans=sub(ans,1ll*s2(l,r)*Sf(n/l)%mod);

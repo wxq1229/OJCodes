@@ -22,7 +22,7 @@ int n,m,tn,tb,tot;
 int bel[N],cc[2333][N],ansv[2333][2333],ansc[2333][2333];
 int lb[2333],rb[2333];
 void init() {
-    tn=(int)(pow(n/2.0,1.0/3.0)+0.5);
+    tn=(int)(pow(n/2.0,0.5)+0.5);
     rep(i,1,n+1) {
         bel[i]=(i-1)/tn+1,tb=bel[i];
         lb[bel[i]]=lb[bel[i]]==0?i:lb[bel[i]];

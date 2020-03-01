@@ -48,12 +48,22 @@ void init() {
 #define getcc(l,r,k) (cc[r][k]-cc[l-1][k])
 
 int query(int l,int r) {
+    static int cnt[N];
     int bbl=bel[l],bbr=bel[r];
+    if(bbl==bbr) {
+        int ans1=0,ans2=0;
+        rep(i,l,r+1) {
+            ++cnt[a[i].x];
+            if(cnt[a[i].x]>ans2||(cnt[a[i].x]==ans2&&a[i].v<ans1))
+                ans1=a[i].v,ans2=cnt[a[i].x];
+        }
+        rep(i,l,r+1) --cnt[a[i].x];
+        return ans1;
+    }
     int l0=1,r0=0,l1=1,r1=0;
     if(lb[bbl]!=l) l0=l,r0=rb[bbl],++bbl;
     if(rb[bbr]!=r) l1=lb[bbr],r1=r,--bbr;
     int ans1=ansv[bbl][bbr],ans2=ansc[bbl][bbr];
-    static int cnt[N];
     rep(i,l0,r0+1) {
         ++cnt[a[i].x];
         int tmpc=cnt[a[i].x]+getcc(bbl,bbr,a[i].x);

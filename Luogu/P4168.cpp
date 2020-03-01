@@ -19,8 +19,8 @@ struct node {
 }a[N];
 int n,m,tn,tb,tot;
 
-int bel[N],cc[2333][N],ansv[2333][2333],ansc[2333][2333];
-int lb[2333],rb[2333];
+int bel[N],cc[300][N],ansv[300][300],ansc[300][300];
+int lb[300],rb[300];
 void init() {
     tn=(int)(pow(n/2.0,0.5)+0.5);
     rep(i,1,n+1) {

@@ -167,8 +167,7 @@ int main() {
 		a[i][0]=mod-x,a[i][1]=1;
 	}
 	build(1,1,m);
-	A=A%p[1];
-	solve(1,1,m,A);
+	solve(1,1,m,A%p[1]);
 	rep(i,1,m+1) printf("%d\n",ans[i]);
 	return 0;
 }

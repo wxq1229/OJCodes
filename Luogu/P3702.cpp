@@ -18,14 +18,11 @@ struct poly {
     for (int i = 0; i <= p * 2; i++) A[i] = 0;
     for (int i = 0; i < p; i++)
       for (int j = 0; j < p; j++) {
-        A[i + j] += 1ll * a[i] * o[j] % mod;
-        if (A[i + j] >= mod) A[i+j] -= mod;
+        int k = (i+j) % p; A[k] += 1ll * a[i] * o[j] % mod;
+        if (A[k] >= mod) A[k] -= mod;
       }
     poly ans;
-    for (int i = 0; i < p; i++) {
-      ans[i] = A[i] + A[i+p];
-      if (ans[i] >= mod) ans[i] -= mod;
-    }
+    for (int i = 0; i < p; i++) ans[i] = A[i];
     return ans;
   }
 };

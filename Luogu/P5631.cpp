@@ -108,7 +108,7 @@ int main() {
     int w = gi();
     if (0 <= w - 1) upd(1, 0, w - 1, i);
     if (w + 1 <= lim) upd(1, w + 1, lim, i);
- }
+  }
   solve(1);
   return 0;
 }

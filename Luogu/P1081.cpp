@@ -17,8 +17,7 @@ struct node {
   }
 };
 int nxta[N], nxtb[N];
-long long nxtda[N], nxtdb[N], disa[N][LOG], disb[N][LOG];
-int desta[N][LOG], destb[N][LOG];
+long long nxtda[N], nxtdb[N];
 int dest[N][LOG];
 struct info {
   long long a, b;
@@ -61,32 +60,14 @@ void init() {
         nxta[i] = itss->id;
       }
     }
-    nxtda[i] = abs(h[i] - h[nxta[i]]);
-    nxtdb[i] = abs(h[i] - h[nxtb[i]]); 
+    if (nxta[i]) nxtda[i] = abs(h[i] - h[nxta[i]]);
+    if (nxtb[i]) nxtdb[i] = abs(h[i] - h[nxtb[i]]); 
     s.insert({i, h[i]});
-  }               
-  for (int i = 1; i <= n; i++) {
-    desta[i][0] = nxta[i];
-    if (desta[i][0]) {
-      disa[i][0] = nxtda[i];
-    }
-    destb[i][0] = nxtb[i];
-    if (destb[i][0]) {
-      disb[i][0] = nxtdb[i];
-    }
-  }
-  for (int j = 1; j < LOG; j++) {
-    for (int i = 1; i <= n; i++) {
-      disa[i][j] = disa[desta[i][j - 1]][j - 1] + disa[i][j - 1];
-      disb[i][j] = disb[destb[i][j - 1]][j - 1] + disb[i][j - 1];
-      desta[i][j] = desta[desta[i][j - 1]][j - 1];
-      destb[i][j] = destb[destb[i][j - 1]][j - 1];
-    }
   }
   for (int i = 1; i <= n; i++) {
-    dest[i][0] = destb[desta[i][0]][0];
+    dest[i][0] = nxtb[nxta[i]];
     if (dest[i][0]) {
-      dis[i][0] = {disa[i][0], disb[desta[i][0]][0]};
+      dis[i][0] = {nxtda[i], nxtdb[nxta[i]]};
     }
   }
   for (int j = 1; j < LOG; j++) {
@@ -111,8 +92,8 @@ info query(int s, int x) {
     } 
   }
   // cerr << "at: " << at << '\n';
-  if (ans.d() + disa[at][0] <= x) {
-    ans.a += disa[at][0];
+  if (ans.d() + nxtda[at] <= x) {
+    ans.a += nxtda[at];
   }
   // cerr << endl;
   return ans;

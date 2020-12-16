@@ -59,8 +59,8 @@ int main() {
 
 		int ptr = l;
 		for (int i = mid; i < r; ++i) {
-			while (cc[ptr][0] >= m) ++ptr;
-			while (ptr < mid && cc[ptr][0] < m) {
+			while (ptr < mid) {
+				if (cc[ptr][0] >= m) { ++ptr; continue; }
 				int c1 = cc[ptr][1], c0 = cc[i][0];
 				int ct = std::min(c1, c0);
 				if (ct == c0) {

@@ -85,7 +85,7 @@ struct Poly {
 	friend std::ostream &operator<<(std::ostream &os, const Poly &p) { return os << p.a; }
 };
 
-int fact[K], invFact[K];
+int fact[K], invFact[K], pw[K][K];
 struct Lagrange {
 	int x[K], y[K], n, kk;
 
@@ -94,16 +94,16 @@ struct Lagrange {
 		n = k + 2;
 		kk = k;
 		for (int i = 1; i <= n; ++i) {
-			upd(sum, mpow(i, k));
+			upd(sum, pw[i][k]);
 			x[i] = i, y[i] = sum;
 		}
 	}
 	
-	int64_t calc(int x0) {
+	int calc(int x0) {
 		if (x0 <= n) {
 			int ans = 0;
 			for (int i = 1; i <= x0; ++i) {
-				upd(ans, mpow(i, kk));
+				upd(ans, pw[i][kk]);
 			}
 			return ans;
 		}
@@ -124,12 +124,15 @@ struct Lagrange {
 int w[K], n, k;
 struct Walk { int c, d; } walk[N];
 
-int lft[K][N], rgt[K][N], delta[K], ori[K];
+int lft[K][N], rgt[K][N], delta[K], ori[K], res[K];
 
 int main() {
 	std::ios::sync_with_stdio(false);
 	std::cin.tie(0);
 
+	for (int i = 0; i < K; ++i)
+		for (int j = 0; j < K; ++j)
+			pw[i][j] = mpow(i, j);
 	fact[0] = 1;
 	for (int i = 1; i < K; ++i)
 		fact[i] = int64_t(fact[i - 1]) * i % P;
@@ -168,12 +171,12 @@ int main() {
 		int tmp = 1;
 		for (int j = 1; j <= k; ++j)
 			tmp = int64_t(tmp) * std::max(0, w[j] - rgt[j][i] + lft[j][i]) % P;
-		if (tmp == 0) break;
 		upd(ans, tmp);
 	}
 
+	int lst = -1;
 	for (int i = 1; i <= n; ++i) {
-		int lim = P;
+		int lim = 1e9;
 		bool flg = 0;
 		Poly mul = 1;
 		for (int j = 1; j <= k; ++j) {
@@ -189,13 +192,17 @@ int main() {
 		}
 		if (flg) break;
 
+		if (lim != lst) {
+			for (int j = 0; j <= k; ++j)
+				res[j] = func[j].calc(lim);
+		}
 		upd(ans, int64_t(mul[0]) * (lim + 1) % P);
 		int tmp = 0;
-		assert(mul.size() < K);
 		for (int j = 1; j < mul.size(); ++j) {
-			upd(tmp, int64_t(mul[j]) * func[j].calc(lim) % P);
+			upd(tmp, int64_t(mul[j]) * res[j] % P);
 		}
 		upd(ans, tmp);
+		lst = lim;
 	}
 
 	std::cout << ans << '\n';

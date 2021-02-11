@@ -10,20 +10,6 @@ std::string adjust(const std::string &s) {
 	res += "!";
     return res;
 }
-std::vector<int> manacher(const std::string &s) {
-	int n = (int) s.size();
-	std::vector<int> R(n);
-	int p = -1, mx = -1;
-	for (int i = 0; i < n; ++i) {
-		if (i <= mx) R[i] = std::min(mx - i + 1, R[2 * p - i]);
-		else R[i] = 1;
-		while (i - R[i] >= 0 && i + R[i] < n && s[i - R[i]] == s[i + R[i]])
-			++R[i];
-		if (i + R[i] - 1 > mx)
-			p = i, mx = i + R[i] - 1;
-	}
-	return R;
-}
 
 constexpr int N = 300010, SIGMA = 26;
 int len[2 * N], endpos[2 * N], next[2 * N][SIGMA], link[N * 2], cnt, last;
@@ -110,16 +96,24 @@ int main() {
 	
 	s = adjust(s);
 	int m = int(s.size());
-	auto R = manacher(s);
+	std::vector<int> R(m);
+	int p = -1, mx = -1;
 	i64 ans = 0;
-	for (int i = 1; i < m - 1; ++i) {
-		int l = i - R[i] + 1;
-		int r = i + R[i] - 1;
-		++l, --r;
-		if (l > r) continue;
-		l /= 2, r /= 2;
-		int tot = endpos[get(at[r], r - l + 1)];
-		ans = std::max(ans, 1ll * tot * (r - l + 1));
+	for (int i = 0; i < m; ++i) {
+		if (i <= mx) R[i] = std::min(mx - i + 1, R[2 * p - i]);
+		else R[i] = 1;
+		while (i - R[i] >= 0 && i + R[i] < m && s[i - R[i]] == s[i + R[i]]) {
+			++R[i];
+			if (s[i - R[i] + 1] == '!' && i > 0 && i < m - 1) {
+				int l = i - R[i] + 1, r = i + R[i] - 1;
+				++l, --r;
+				l /= 2, r /= 2;
+				// std::cerr << l << " " << r << " " << endpos[get(at[r], r - l + 1)] << '\n';
+				ans = std::max(ans, 1ll * (r - l + 1) * endpos[get(at[r], r - l + 1)]);
+			}
+		}
+		if (i + R[i] - 1 > mx)
+			p = i, mx = i + R[i] - 1;
 	}
 	std::cout << ans << '\n';
 	return 0;

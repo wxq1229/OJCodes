@@ -46,9 +46,9 @@ struct SegmentTree {
 	void modify(int &x, int l, int r, int p, int vi, int vj, int vk) {
 		if (!x) x = newNode();
 		if (l == r) {
-			t[x].c[I] = vi;
+			upd(t[x].c[I], vi);
 			upd(t[x].c[J], vj);
-			t[x].c[K] = vk;
+			upd(t[x].c[K], vk);
 			return;
 		}
 		int mid = (l + r) >> 1;
@@ -108,7 +108,7 @@ int main() {
 		int opt, x;
 		std::cin >> opt >> x;
 		int vi, vj, vk;
-		if (opt == 1) vi = 0, vj = P - 1, vk = 0;
+		if (opt == 1) vi = P - pre[x], vj = P - 1, vk = P - suf[x];
 		else vi = pre[x], vj = 1, vk = suf[x];
 		upd(ans, P - st.t[rt[a[x]]].c[IJK]);
 		st.modify(rt[a[x]], 1, n, x, vi, vj, vk);
